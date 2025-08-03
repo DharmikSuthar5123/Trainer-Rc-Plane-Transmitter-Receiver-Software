@@ -24,7 +24,7 @@ Each channel can be independently inverted to match the orientation and response
 All settings are **permanently saved** to onboard memory. Your preferences remain intact even after powering off the transmitter or receiver, ensuring a seamless and worry-free experience.
 
 ### 📡 Robust Wireless Communication
-Reliable 2.4GHz communication (e.g., via **nRF24L01 modules**) ensures stable control signal transmission over a significant range – ideal for park flyers, DIY drones, and robotics.
+Reliable 2.4GHz communication via **nRF24L01 modules** ensures stable control signal transmission over a significant range – ideal for park flyers, DIY drones, and robotics.
 
 ---
 
