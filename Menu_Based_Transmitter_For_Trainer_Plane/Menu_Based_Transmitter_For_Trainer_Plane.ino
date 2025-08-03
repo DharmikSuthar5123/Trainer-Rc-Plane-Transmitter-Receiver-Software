@@ -1,3 +1,5 @@
+#include <EEPROM.h>
+
 #include <RF24.h>
 #include <SPI.h>
 #include <Wire.h>
@@ -9,6 +11,7 @@ long now;
 bool toggle = true;
 const float r1 = 1000;
 const float r2 = 215;
+int8_t prevl2;
 RF24 radio(7, 8);
 const byte address[6] = "12345";
 const char* menuItems[] = { "motor", "s1", "s2", "s3" };
@@ -23,6 +26,7 @@ int8_t currentMenu = 0;
 int j1x, j1y, j2x, j2y, pot;
 int l1, l2, sw;
 void setup() {
+
   Serial.begin(9600);
 
   u8g2.begin();
@@ -37,6 +41,18 @@ void setup() {
   pinMode(5, INPUT_PULLUP);
   pinMode(10, OUTPUT);
   pinMode(9, OUTPUT);
+  EEPROM.get(0,config[0][0]); 
+  EEPROM.get(2,config[0][1]); 
+  EEPROM.get(4,config[0][2]); 
+  EEPROM.get(6,config[1][0]); 
+  EEPROM.get(8,config[1][1]); 
+  EEPROM.get(10,config[1][2]);
+  EEPROM.get(12,config[2][0]);
+  EEPROM.get(14,config[2][1]);
+  EEPROM.get(16,config[2][2]);
+  EEPROM.get(18,config[3][0]);
+  EEPROM.get(20,config[3][1]);
+  EEPROM.get(22,config[3][2]);
 }
 
 struct dataPack {
@@ -64,6 +80,7 @@ void loop() {
   u8g2.setCursor(60, u8g2.getMaxCharHeight() * 4);
   u8g2.print(config[currentMenu][2]);
   u8g2.sendBuffer();
+  
 }
 
 void GetInp() {
@@ -101,15 +118,32 @@ void GetInp() {
       }
     }
   } else {
+    if (prevl2 == 1) {
+      EEPROM.put(0, config[0][0]);
+      EEPROM.put(2, config[0][1]);
+      EEPROM.put(4, config[0][2]);
+
+      EEPROM.put(6, config[1][0]);
+      EEPROM.put(8, config[1][1]);
+      EEPROM.put(10, config[1][2]);
+
+      EEPROM.put(12, config[2][0]);
+      EEPROM.put(14, config[2][1]);
+      EEPROM.put(16, config[2][2]);
+
+      EEPROM.put(18, config[3][0]);
+      EEPROM.put(20, config[3][1]);
+      EEPROM.put(22, config[3][2]);
+      Serial.println("Config Saved");
+    }
     data.motor = constrain(map(j1y, 0, 1023, config[0][0], config[0][2]), 0, 180);
     data.s1 = constrain(map(j2x, 0, 1023, config[1][0], config[1][2]) + config[1][1], 0, 180);
     data.s2 = constrain(map(j2x, 0, 1023, config[2][2], config[2][0]) + config[2][1], 0, 180);
     data.s3 = constrain(map(j2y, 0, 1023, config[3][0], config[3][2]) + config[3][1], 0, 180);
   }
   prevDiff2 = diff2;
+  prevl2 = l2;
 }
-
-
 // void VoltageCheck() {
 //   float vOut = analogRead(A7) * (5.0 / 1023.0);
 //   float vIn = vOut * ((r1 + r2) / r2);
