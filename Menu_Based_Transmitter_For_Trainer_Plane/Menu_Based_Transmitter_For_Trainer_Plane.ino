@@ -7,24 +7,24 @@
 #include <U8g2lib.h>
 
 U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0);
-long now;
-bool toggle = true;
-const float r1 = 1000;
-const float r2 = 215;
+//long now;
+// bool toggle = true;
+// const float r1 = 1000;
+// const float r2 = 215;
 int8_t prevl2;
 RF24 radio(7, 8);
 const byte address[6] = "12345";
 const char* menuItems[] = { "motor", "s1", "s2", "s3" };
-int config[4][3] = {
-  { 180, 0, 0 },
+int16_t config[4][3] = {
+  { 180, 90, 0 },
   { 0, 33, 85 },
   { 29, 16, 120 },
   { -10, 44, 60 }
 };
 uint8_t menuSize = sizeof(menuItems) / sizeof(menuItems[0]);
 int8_t currentMenu = 0;
-int j1x, j1y, j2x, j2y, pot;
-int l1, l2, sw;
+int16_t j1x, j1y, j2x, j2y, pot;
+int16_t l1, l2, sw;
 void setup() {
 
   Serial.begin(9600);
@@ -41,26 +41,15 @@ void setup() {
   pinMode(5, INPUT_PULLUP);
   pinMode(10, OUTPUT);
   pinMode(9, OUTPUT);
-  EEPROM.get(0,config[0][0]); 
-  EEPROM.get(2,config[0][1]); 
-  EEPROM.get(4,config[0][2]); 
-  EEPROM.get(6,config[1][0]); 
-  EEPROM.get(8,config[1][1]); 
-  EEPROM.get(10,config[1][2]);
-  EEPROM.get(12,config[2][0]);
-  EEPROM.get(14,config[2][1]);
-  EEPROM.get(16,config[2][2]);
-  EEPROM.get(18,config[3][0]);
-  EEPROM.get(20,config[3][1]);
-  EEPROM.get(22,config[3][2]);
+  EEPROM.get(0, config);
 }
 
 struct dataPack {
-  int motor, s1, s2, s3;
+  int16_t motor, s1, s2, s3;
 };
 
 dataPack data;
-int diff, diff2, prevDiff2;
+int8_t diff, diff2, prevDiff2;
 void loop() {
 
   u8g2.clearBuffer();
@@ -71,16 +60,19 @@ void loop() {
   radio.write(&data, sizeof(data));
   if (l2 == 1) u8g2.drawBox(0, 62, 128, 2);
   u8g2.setFont(u8g2_font_8x13_tr);
-  u8g2.setCursor(60, u8g2.getMaxCharHeight() * 2);
-  u8g2.print(config[currentMenu][0]);
+  // u8g2.setCursor(60, u8g2.getMaxCharHeight() * 2);
+  // u8g2.print(config[currentMenu][0]);
 
-  u8g2.setCursor(60, u8g2.getMaxCharHeight() * 3);
-  u8g2.print(config[currentMenu][1]);
+  // u8g2.setCursor(60, u8g2.getMaxCharHeight() * 3);
+  // u8g2.print(config[currentMenu][1]);
 
-  u8g2.setCursor(60, u8g2.getMaxCharHeight() * 4);
-  u8g2.print(config[currentMenu][2]);
+  // u8g2.setCursor(60, u8g2.getMaxCharHeight() * 4);
+  // u8g2.print(config[currentMenu][2]);
+  for (int i = 0; i < 3; i++) {
+    u8g2.setCursor(60, u8g2.getMaxCharHeight() * (i+2));
+    u8g2.print(config[currentMenu][i]);
+  }
   u8g2.sendBuffer();
-  
 }
 
 void GetInp() {
@@ -119,21 +111,7 @@ void GetInp() {
     }
   } else {
     if (prevl2 == 1) {
-      EEPROM.put(0, config[0][0]);
-      EEPROM.put(2, config[0][1]);
-      EEPROM.put(4, config[0][2]);
-
-      EEPROM.put(6, config[1][0]);
-      EEPROM.put(8, config[1][1]);
-      EEPROM.put(10, config[1][2]);
-
-      EEPROM.put(12, config[2][0]);
-      EEPROM.put(14, config[2][1]);
-      EEPROM.put(16, config[2][2]);
-
-      EEPROM.put(18, config[3][0]);
-      EEPROM.put(20, config[3][1]);
-      EEPROM.put(22, config[3][2]);
+      EEPROM.put(0, config);
       Serial.println("Config Saved");
     }
     data.motor = constrain(map(j1y, 0, 1023, config[0][0], config[0][2]), 0, 180);

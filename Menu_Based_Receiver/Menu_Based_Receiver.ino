@@ -9,11 +9,9 @@ Servo esc2;
 Servo s1;
 Servo s2;
 Servo s3;
-
-int pos = 0;
 const byte address[] = "12345";
 struct dataPack {
-  int motor, s1, s2, s3;
+  int16_t motor, s1, s2, s3;
 };
 dataPack data;
 int servoVal;
@@ -33,5 +31,18 @@ void loop() {
   if (radio.available()) {
     radio.read(&data, sizeof(data));
   }
-  
+  esc1.write(data.motor);
+  s1.write(data.s1);
+  s2.write(data.s2);
+  s3.write(data.s3);
+
+ Serial.print(data.motor);
+ Serial.print(" * "); 
+ Serial.print(data.s1);
+ Serial.print(" * ");
+ Serial.print(data.s2);
+ Serial.print(" * ");
+ Serial.println(data.s3);
+
+
 }
